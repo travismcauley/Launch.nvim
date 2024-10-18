@@ -11,10 +11,13 @@ function M.config()
     "lua_ls",
     "cssls",
     "html",
-    "tsserver",
+    "eslint",
     "pyright",
     "bashls",
+    "ts_ls",
     "jsonls",
+    "yamlls",
+    "gopls",
   }
 
   require("mason").setup {

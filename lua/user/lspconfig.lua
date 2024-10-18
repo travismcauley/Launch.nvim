@@ -23,7 +23,7 @@ M.on_attach = function(client, bufnr)
   lsp_keymaps(bufnr)
 
   if client.supports_method "textDocument/inlayHint" then
-    vim.lsp.inlay_hint.enable(bufnr, true)
+    vim.lsp.inlay_hint.enable(true, {bufnr = bufnr})
   end
 end
 
@@ -35,47 +35,51 @@ end
 
 M.toggle_inlay_hints = function()
   local bufnr = vim.api.nvim_get_current_buf()
-  vim.lsp.inlay_hint.enable(bufnr, not vim.lsp.inlay_hint.is_enabled(bufnr))
+  local inlay_hint_is_active = vim.lsp.inlay_hint.is_enabled({bufnr = bufnr})
+
+  vim.lsp.inlay_hint.enable(not inlay_hint_is_active, {bufnr = bufnr})
+
 end
 
 function M.config()
   local wk = require "which-key"
-  wk.register {
-    ["<leader>la"] = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
-    ["<leader>lf"] = {
+  wk.add {
+    {"<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action" },
+    {"<leader>lf",
       "<cmd>lua vim.lsp.buf.format({async = true, filter = function(client) return client.name ~= 'typescript-tools' end})<cr>",
-      "Format",
+      desc = "Format",
     },
-    ["<leader>li"] = { "<cmd>LspInfo<cr>", "Info" },
-    ["<leader>lj"] = { "<cmd>lua vim.diagnostic.goto_next()<cr>", "Next Diagnostic" },
-    ["<leader>lh"] = { "<cmd>lua require('user.lspconfig').toggle_inlay_hints()<cr>", "Hints" },
-    ["<leader>lk"] = { "<cmd>lua vim.diagnostic.goto_prev()<cr>", "Prev Diagnostic" },
-    ["<leader>ll"] = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-    ["<leader>lq"] = { "<cmd>lua vim.diagnostic.setloclist()<cr>", "Quickfix" },
-    ["<leader>lr"] = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+    {"<leader>li", "<cmd>LspInfo<cr>", desc = "Info" },
+    {"<leader>lj", "<cmd>lua vim.diagnostic.goto_next()<cr>", desc = "Next Diagnostic" },
+    {"<leader>lh", "<cmd>lua require('user.lspconfig').toggle_inlay_hints()<cr>",desc =  "Hints" },
+    {"<leader>lk", "<cmd>lua vim.diagnostic.goto_prev()<cr>",desc =  "Prev Diagnostic" },
+    {"<leader>ll", "<cmd>lua vim.lsp.codelens.run()<cr>",desc =  "CodeLens Action" },
+    {"<leader>lq", "<cmd>lua vim.diagnostic.setloclist()<cr>",desc =  "Quickfix" },
+    {"<leader>lr", "<cmd>lua vim.lsp.buf.rename()<cr>",desc =  "Rename" },
   }
 
-  wk.register {
-    ["<leader>la"] = {
-      name = "LSP",
-      a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action", mode = "v" },
-    },
-  }
+  -- wk.add {
+  --   ["<leader>la"] = {
+  --     name = "LSP",
+  --     a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", desc = "Code Action", mode = "v" },
+  --   },
+  -- }
 
   local lspconfig = require "lspconfig"
+  local util = require "lspconfig/util"
   local icons = require "user.icons"
 
   local servers = {
     "lua_ls",
     "cssls",
     "html",
-    "tsserver",
     "eslint",
-    "tsserver",
+    "ts_ls",
     "pyright",
     "bashls",
     "jsonls",
     "yamlls",
+    "gopls",
   }
 
   local default_diagnostic_config = {
@@ -104,7 +108,7 @@ function M.config()
 
   vim.diagnostic.config(default_diagnostic_config)
 
-  for _, sign in ipairs(vim.tbl_get(vim.diagnostic.config(), "signs", "values") or {}) do
+  for _, sign in ipairs(default_diagnostic_config.signs.values) do
     vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = sign.name })
   end
 
@@ -125,6 +129,48 @@ function M.config()
 
     if server == "lua_ls" then
       require("neodev").setup {}
+    end
+
+    if server == "gopls" then
+      opts.cmd = {"gopls"}
+      opts.filetypes = {"go", "gomod", "gowork", "gotmpl"}
+      opts.root_dir = util.root_pattern("go.work","go.mod" ,".git")
+      opts.settings = {
+        gopls = {
+          gofumpt = false,
+          codelenses = {
+            gc_details = false,
+            generate = true,
+            regenerate_cgo = true,
+            run_govulncheck = true,
+            test = true,
+            tidy = true,
+            upgrade_dependency = true,
+            vendor = true,
+          },
+          -- hints = {
+          --   assignVariableTypes = true,
+          --   compositeLiteralFields = true,
+          --   compositeLiteralTypes = true,
+          --   constantValues = true,
+          --   functionTypeParameters = true,
+          --   parameterNames = true,
+          --   rangeVariableTypes = true,
+          -- },
+          analyses = {
+            fieldalignment = true,
+            nilness = true,
+            unusedparams = true,
+            unusedwrite = true,
+            useany = true,
+          },
+          usePlaceholders = true,
+          completeUnimported = true,
+          staticcheck = true,
+          directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+          semanticTokens = true,
+        }
+      }
     end
 
     lspconfig[server].setup(opts)
