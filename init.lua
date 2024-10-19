@@ -1,14 +1,14 @@
-require "user.launch" -- global function spec for loading all plugins in a modular way
-require "user.options"
-require "user.keymaps"
-require "user.autocmds" -- holds all autocommands that trigger on vim events
-spec "user.go" -- holds go plug in
-spec "user.colorscheme"
-spec "user.devicons"
-spec "user.treesitter" -- gives us syntax highlighting
-spec "user.mason" -- helps us install things + put on PATH, like formatters / linters 
-spec "user.schemastore" -- help w/ yaml + json schemas
-spec "user.lspconfig" -- manages our langurage servers
+require ("user.launch")   -- global function spec for loading all plugins in a modular way
+require ("user.options")
+require ("user.keymaps")  -- holds core movement keymap bindings
+require ("user.autocmds") -- holds all autocommands that trigger on vim events
+-- spec "user.go"          -- holds go plug in
+spec ("user.colorscheme") -- sets up our colorscheme
+spec ("user.devicons")    -- gives us cool icons in our file tree
+spec ("user.treesitter")  -- gives us syntax highlighting
+spec ("user.mason")       -- gives us easy install of lsp binaries / formatters / linters + put on PATH 
+spec ("user.schemastore") -- gives us autocompletion for yaml + json schemas 
+spec "user.lspconfig"     -- manages our langurage servers
 spec "user.cmp"
 spec "user.telescope" -- fuzzy finder + grep
 spec "user.none-ls"
@@ -35,4 +35,4 @@ spec "user.extras.tabby" -- gives us ability to create tabs
 spec "user.extras.neoscroll" -- sets easy file scroll to Ctrl + j / k
 spec "user.extras.ufo" -- enables easy folds (za / zR / zM)
 spec "user.extras.fidget" -- enables better loading screens (bottom right corner)
-require "user.lazy"
+require ("user.lazy") -- plugin manager
