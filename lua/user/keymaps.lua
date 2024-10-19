@@ -49,8 +49,11 @@ keymap("v", "<A-j>", ":m .+1<CR>==", opts)
 keymap("v", "<A-k>", ":m .-2<CR>==", opts)
 keymap("v", "p", '"_dP', opts)
 
+-- this gives us the ability to hold onto the thing we copied after pasting over the top of something
+-- keymap("x", "p", [["_dP]])
+
 -- VISUAL BLOCK -- 
-keymap("x", "p", [["_dP]])
+
 -- Move text up and down
 keymap("x", "J", ":move '>+1<CR>gv-gv", opts)
 keymap("x", "K", ":move '<-2<CR>gv-gv", opts)
@@ -65,8 +68,9 @@ vim.keymap.set("n", "<RightMouse>", "<cmd>:popup mousemenu<CR>")
 vim.keymap.set("n", "<Tab>", "<cmd>:popup mousemenu<CR>")
 
 -- more good
-keymap({ "n", "o", "x" }, "<s-h>", "^", opts)
-keymap({ "n", "o", "x" }, "<s-l>", "g_", opts)
+
+keymap({ "n", "o", "x" }, "<s-h>", "^", opts) -- shift + h jumps us to the beginning of a line
+keymap({ "n", "o", "x" }, "<s-l>", "g_", opts) -- shift + l jumps us to end of the line
 
 -- tailwind bearable to work with
 keymap({ "n", "x" }, "j", "gj", opts)
