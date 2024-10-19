@@ -1,4 +1,4 @@
-require "user.launch"
+require "user.launch" -- global function spec for loading all plugins in a modular way
 require "user.options"
 require "user.keymaps"
 require "user.autocmds" -- holds all autocommands that trigger on vim events
